@@ -19,7 +19,8 @@ const FormComponent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://localhost:7281/api/Customers/create", {
+      // Simulate a sign-up process
+      const signupResponse = await fetch("https://localhost:7281/api/Customers/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,18 +28,31 @@ const FormComponent = () => {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        alert("Form submitted successfully!");
+      if (signupResponse.ok) {
+        // Simulate logging in by storing user info in sessionStorage
+        sessionStorage.setItem('user', JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+        }));
+
+        alert("Signed up and logged in successfully!");
+
+        // Optionally, redirect or perform any other actions upon successful signup/login
+        // window.location.href = '/dashboard'; // Example redirect
+
         setFormData({
           name: "",
           email: "",
           password: "",
         });
+
+        // Refresh the page
+        window.location.reload();
       } else {
-        alert("Failed to submit form. Please try again.");
+        alert("Failed to sign up. Please try again.");
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error:", error);
       alert("An error occurred. Please try again later.");
     }
   };
@@ -83,7 +97,7 @@ const FormComponent = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <button type="submit" className="w-full bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button type="submit" className="w-full bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
             Submit
           </button>
         </form>
