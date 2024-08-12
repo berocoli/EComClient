@@ -20,7 +20,7 @@ const PdfButtonComponent = () => {
     };
     return (
         <div id="root">
-            <span className="bg-gradient-to-br from-green-500 to-purple-600 rounded-xl font-mono text-white px-4 py-4">
+            <span className="bg-gradient-to-br from-green-500 to-purple-600 rounded-xl text-white px-4 py-4">
                 <button onClick={downloadButton}>Download PDF</button>
             </span>
         </div>

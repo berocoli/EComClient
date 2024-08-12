@@ -118,6 +118,9 @@ function App() {
         <div id="main-content" className="container mx-auto p-4 mt-20">
           {apiData && (
             <div>
+              <div className='flex justify-center items-center center text-center content-center'>
+                <h2 className='text-gray-100 font-medium italic bg-zinc-600 rounded-md px-2 py-2'>Customers List</h2>
+              </div>
               <div className="relative mt-4 overflow-x-auto shadow-md">
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead className="table-header-group">
@@ -179,8 +182,9 @@ function App() {
           )}
           {showForm && <LoginForm />}
         </div>
-      </>
-      );
+        </>
+    </>
+  );
 }
 
-      export default App;
+export default App;

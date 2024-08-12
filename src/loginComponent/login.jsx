@@ -22,45 +22,46 @@ const LoginComponent = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            // Simulate a sign-up process
-            const loginResponse = await fetch("AYOOO/CHANGETHIS", {
-                method: "POST ",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (loginResponse.ok) {
-                // Simulate logging in by storing user info in sessionStorage
-                sessionStorage.setItem('user', JSON.stringify({
-                    name: formData.name,
-                    email: formData.email,
-                }));
-
-                alert("Logged in successfully!");
-
-                setFormData({
-                    name: '',
-                    email: '',
-                    password: '',
+        const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegEx.test(formData.input)) {
+            console.log('Sending email login request');
+            try {
+                const response = await axios.post('https://localhost:7281/api/Customers/LoginWithEmail', {
+                    email: formData.input,
+                    password: formData.password
                 });
-
-                // Refresh the page
-                window.location.reload();
-            } else {
-                alert("Failed to sign up. Please try again.");
+                if (response.status === 200) {
+                    console.log('Login with email successful');
+                    sessionStorage.setItem('user', response.data);
+                    window.location.reload();
+                } else {
+                    console.error('Error logging in:', response.data);
+                }
+            } catch (error) {
+                console.error('Error logging in', error);
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred. Please try again later.");
-        }
-    };
-
+            } else {
+                console.log('Sending name login request');
+                try {
+                    const response = await axios.post('https://localhost:7281/api/Customers/LoginWithName', {
+                        name: formData.input,
+                        password: formData.password
+                    });
+                    if(response.status === 200){
+                        console.log('Login with username successful');
+                        sessionStorage.setItem('user', response.data);
+                        window.location.reload();
+                    } else {
+                        console.error('Error logging in:', response.data);
+                    }
+                } catch {
+                    console.error('Error logging in:', error);
+                }
+            }
+        };
     const toggleForm = () => {
         setShowSignupForm(!showSignupForm);
-    };
+    }
 
     return (
         <>
@@ -70,24 +71,12 @@ const LoginComponent = () => {
                 ) : (
                     <form onSubmit={handleSubmit} className='bg-white shadow-md'>
                         <div className="mb-4 px-4 py-4">
-                            <label htmlFor="name" className="block text-gray-700 font-bold mb-2">Name:</label>
+                            <label htmlFor="input" className="block text-gray-700 font-bold mb-2">Name or Email:</label>
                             <input
                                 type="text"
-                                id="name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        </div>
-                        <div className="mb-4 px-4 py-4">
-                            <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email:</label>
-
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={formData.email}
+                                id="input"
+                                name="input"
+                                value={formData.email || formData.name}
                                 onChange={handleChange}
                                 required
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -127,5 +116,4 @@ const LoginComponent = () => {
         </>
     );
 };
-
 export default LoginComponent;
