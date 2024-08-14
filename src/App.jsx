@@ -4,6 +4,7 @@ import axios from 'axios';
 import LoginForm from './loginComponent/login';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import PdfButtonComponent from './PdfButtonComponent/pdfComponent';
+import ProductsComponent from './productsComponent/Products';
 
 function App() {
   const [apiData, setApiData] = useState(null);
@@ -87,7 +88,7 @@ function App() {
   }
 
   return (
-    <>
+    <><>
       <nav className="flex fixed justify-between items-center top-0 left-0 w-full bg-slate-600 text-white p-4 shadow z-50">
         <span className="rounded-lg bg-zinc-700 hover:bg-zinc-800 px-2 py-1 cursor-help">هاوڕێ</span>
         <span className="rounded-lg bg-zinc-700 hover:bg-zinc-800 px-2 py-1 cursor-pointer" onClick={fetchData}>
@@ -181,9 +182,16 @@ function App() {
             </div>
           )}
           {showForm && <LoginForm />}
+          <div className="mt-8">
+            <ProductsComponent />
+          </div>
         </div>
-        </>
+      </>
     </>
+
+    </>
+
+
   );
 }
 

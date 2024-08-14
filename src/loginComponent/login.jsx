@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './login.css'; // Adjust the path as necessary
 import FormComponent from '../signupComponent/signup'; // Adjust the path if necessary
-import { root } from 'postcss';
 
 const LoginComponent = () => {
     const [formData, setFormData] = useState({
