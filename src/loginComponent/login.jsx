@@ -4,7 +4,6 @@ import FormComponent from '../signupComponent/signup'; // Adjust the path if nec
 
 const LoginComponent = () => {
     const [formData, setFormData] = useState({
-        name: '',
         email: '',
         password: ''
     });
@@ -21,43 +20,29 @@ const LoginComponent = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const emailRegEx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegEx.test(formData.input)) {
-            console.log('Sending email login request');
-            try {
-                const response = await axios.post('https://localhost:7281/api/Customers/LoginWithEmail', {
-                    email: formData.input,
-                    password: formData.password
-                });
-                if (response.status === 200) {
-                    console.log('Login with email successful');
-                    sessionStorage.setItem('user', response.data);
-                    window.location.reload();
-                } else {
-                    console.error('Error logging in:', response.data);
+        try {
+            const loginResponse = await fetch(`https://localhost:7281/api/Customers/Login?email=${encodeURIComponent(formData.email)}&password=${encodeURIComponent(formData.password)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            } catch (error) {
-                console.error('Error logging in', error);
-            }
+                // No body needed as parameters are sent in the query string
+            });
+    
+            if (loginResponse.ok) {
+                sessionStorage.setItem('user', JSON.stringify({
+                    email: formData.email
+                }));
+                alert('Logged in successfully!');
+                window.location.reload();
             } else {
-                console.log('Sending name login request');
-                try {
-                    const response = await axios.post('https://localhost:7281/api/Customers/LoginWithName', {
-                        name: formData.input,
-                        password: formData.password
-                    });
-                    if(response.status === 200){
-                        console.log('Login with username successful');
-                        sessionStorage.setItem('user', response.data);
-                        window.location.reload();
-                    } else {
-                        console.error('Error logging in:', response.data);
-                    }
-                } catch {
-                    console.error('Error logging in:', error);
-                }
+                alert('Failed to log in. Please try again.');
             }
-        };
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again later.');
+        }
+    };
     const toggleForm = () => {
         setShowSignupForm(!showSignupForm);
     }
@@ -70,12 +55,12 @@ const LoginComponent = () => {
                 ) : (
                     <form onSubmit={handleSubmit} className='bg-white shadow-md'>
                         <div className="mb-4 px-4 py-4">
-                            <label htmlFor="input" className="block text-gray-700 font-bold mb-2">Name or Email:</label>
+                            <label htmlFor="input" className="block text-gray-700 font-bold mb-2">Email:</label>
                             <input
-                                type="text"
-                                id="input"
-                                name="input"
-                                value={formData.email || formData.name}
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
                                 onChange={handleChange}
                                 required
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
