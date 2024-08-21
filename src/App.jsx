@@ -1,24 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
-import LoginForm from './loginComponent/login';
+import LoginForm from './loginComponent/Login';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import PdfButtonComponent from './PdfButtonComponent/pdfComponent';
 import ProductsComponent from './productsComponent/Products';
+import CurrencyRates from './CurrencyComponent/CurrencyRate';
+import Profile from './ProfileComponent/Profile';
 
 function App() {
   const [apiData, setApiData] = useState(null);
   const [currencies, setCurrencies] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showButton, setShowButton] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
-    const user = sessionStorage.getItem('user');
-    setIsSignedIn(!!user);
-    setIsLoggedIn(!!user);
+    const loggedIn = JSON.parse(sessionStorage.getItem('isLoggedIn'));
+    setIsLoggedIn(loggedIn === true);
   }, []);
+
+  const toggleCurrencies = () => {
+    if (isLoggedIn) {
+      setApiData(null);
+      setShowForm(false);
+      setShowButton(false);
+
+      setCurrencies((prevCurrencies) => !prevCurrencies);
+    } else {
+      setCurrencies(false);
+    }
+  };
 
   const fetchData = async () => {
     // Hide other sections
@@ -38,36 +51,9 @@ function App() {
     }
   };
 
-  const currencyEmojis = {
-    USD: "🇺🇸",
-    EUR: "🇪🇺",
-    JPY: "🇯🇵",
-    CHF: "🇨🇭",
-    QAR: "🇶🇦",
-  };
-  
   const pageReloader = () => {
     window.location.reload();
   }
-
-  const fetchCurrencies = async () => {
-    // Hide other sections
-    setApiData(null);
-    setShowForm(false);
-    setShowButton(false);
-
-    if (currencies) {
-      setCurrencies(null);
-    } else {
-      try {
-        const tableData = await axios.get('https://localhost:7281/api/Currency/rates');
-        const currencyData = typeof tableData.data === 'string' ? JSON.parse(tableData.data) : tableData.data;
-        setCurrencies(currencyData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-  };
 
   const toggleForm = () => {
     // Hide other sections
@@ -81,6 +67,7 @@ function App() {
   const handleLogout = () => {
     sessionStorage.removeItem('user');
     alert("Logged out successfully!");
+    sessionStorage.setItem('isLoggedIn', 'false');
     window.location.reload();
   };
 
@@ -92,6 +79,15 @@ function App() {
     setShowButton((prevShowButton) => !prevShowButton);
   };
 
+  const toggleProfile = () => {
+    setApiData(null);
+    setCurrencies(null);
+    setShowForm(false);
+    setShowButton(false);
+
+    setShowProfile((prevShowProfile) => !prevShowProfile);
+  }
+
   return (
     <div>
       <nav className="flex fixed justify-between items-center top-0 left-0 w-full bg-slate-600 text-white p-4 shadow z-50">
@@ -99,9 +95,11 @@ function App() {
         <span className="rounded-lg bg-zinc-700 hover:bg-zinc-800 px-2 py-1 cursor-pointer" onClick={fetchData}>
           {apiData ? 'Close Table' : 'Fetch API Data'}
         </span>
-        <span className="rounded-lg bg-zinc-700 hover:bg-zinc-800 px-2 py-1 cursor-pointer" onClick={fetchCurrencies}>
-          {currencies ? 'Close Currencies' : 'Fetch Currencies'}
-        </span>
+        {isLoggedIn && (
+          <span className="rounded-lg bg-zinc-700 hover:bg-zinc-800 px-2 py-1 cursor-pointer" onClick={toggleCurrencies}>
+            {currencies ? 'Close Currencies' : 'Fetch Currencies'}
+          </span>
+        )}
         {!isLoggedIn && (
           <span className="rounded-lg bg-zinc-700 hover:bg-zinc-800 px-2 py-1 cursor-pointer" onClick={toggleForm}>
             {showForm ? 'Main Menu' : 'Login'}
@@ -109,7 +107,7 @@ function App() {
         )}
         {isLoggedIn && (
           <div className="flex items-center space-x-4">
-            <span className="flex items-center space-x-2 bg-zinc-700 hover:bg-zinc-800 px-3 py-2 rounded-lg cursor-pointer">
+            <span className="flex items-center space-x-2 bg-zinc-700 hover:bg-zinc-800 px-3 py-2 rounded-lg cursor-pointer" onClick={toggleProfile}>
               <FaUserCircle size={24} />
               <span>Logged In</span>
             </span>
@@ -120,6 +118,18 @@ function App() {
           </div>
         )}
       </nav>
+
+      {currencies && (
+        <div className='px-16 py-16'>
+          <CurrencyRates />
+        </div>
+      )}
+
+      {showProfile && (
+        <div className='px-16 py-16'>
+          <Profile />
+        </div>
+      )}
 
       <div id="main-content" className="container mx-auto p-4 mt-20">
         {apiData && (
@@ -151,43 +161,8 @@ function App() {
           </div>
         )}
 
-        {currencies && (
-          <div className="overflow-x-auto shadow-lg rounded-xl">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="table-header-group bg-gray-700">
-                <tr className="table-row">
-                  <th className="table-cell px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider">
-                    Currency Code 🌐
-                  </th>
-                  <th className="table-cell px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider">
-                    Forex Buying 💰
-                  </th>
-                  <th className="table-cell px-6 py-3 text-left text-xs font-medium text-gray-100 uppercase tracking-wider">
-                    Forex Selling 💸
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {currencies.map((currency) => (
-                  <tr key={currency.CurrencyCode}>
-                    <td className="px-6 py-4 whitespace-nowrap outline outline-2 outline-gray-100">
-                      {currencyEmojis[currency.CurrencyCode]} {currency.CurrencyCode}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap outline outline-2 outline-gray-100">
-                      {currency.ForexBuying}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap outline outline-2 outline-gray-100">
-                      {currency.ForexSelling}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
         {showForm && <LoginForm />}
-        
+
         {/* Show ProductsComponent only when none of the others are shown */}
         {!apiData && !currencies && !showForm && (
           <div className="mt-8">
@@ -197,6 +172,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './login.css'; // Adjust the path as necessary
+import './Login.css'; // Adjust the path as necessary
 import FormComponent from '../signupComponent/signup'; // Adjust the path if necessary
 
 const LoginComponent = () => {
@@ -7,6 +7,7 @@ const LoginComponent = () => {
         email: '',
         password: ''
     });
+
 
     const [showSignupForm, setShowSignupForm] = useState(false); // State to toggle forms
 
@@ -21,28 +22,50 @@ const LoginComponent = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const loginResponse = await fetch(`https://localhost:7281/api/Customers/Login?email=${encodeURIComponent(formData.email)}&password=${encodeURIComponent(formData.password)}`, {
+            const loginResponse = await fetch(`https://localhost:7281/api/Auth/Login?Email=${encodeURIComponent(formData.email)}&Password=${encodeURIComponent(formData.password)}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 }
-                // No body needed as parameters are sent in the query string
             });
-    
+
             if (loginResponse.ok) {
-                sessionStorage.setItem('user', JSON.stringify({
-                    email: formData.email
-                }));
-                alert('Logged in successfully!');
-                window.location.reload();
+                const data = await loginResponse.json();  // API'den dönen token verisini alıyoruz
+                console.log('API Response:', data); // Log the full response for debugging
+
+                const token = data.token?.access; // Access the token correctly
+                if (token) {
+                    sessionStorage.setItem('token', token);
+
+                    // Token'ı decode etme ve içeriğini gösterme
+                    const decodedToken = JSON.parse(atob(token.split('.')[1]));
+                    console.log('Decoded JWT:', decodedToken);
+
+                    const { name, email } = decodedToken;
+                    sessionStorage.setItem('userName', name);
+                    sessionStorage.setItem('userEmail', email);
+
+                    alert('Logged in successfully!');
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    window.location.reload();
+                } else {
+                    console.error('Token is undefined:', data);
+                    alert('Failed to retrieve a valid token.');
+                    sessionStorage.setItem('isLoggedIn', 'false');
+                }
             } else {
                 alert('Failed to log in. Please try again.');
+                sessionStorage.setItem('isLoggedIn', 'false');
             }
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred. Please try again later.');
+            sessionStorage.setItem('isLoggedIn', 'false');
         }
     };
+
+
+
     const toggleForm = () => {
         setShowSignupForm(!showSignupForm);
     }

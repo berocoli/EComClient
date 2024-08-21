@@ -28,17 +28,10 @@ const FormComponent = () => {
         body: JSON.stringify(formData),
       });
 
-
       if (signupResponse.ok) {
-        // Simulate logging in by storing user info in sessionStorage
-        sessionStorage.setItem('user', JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-        }));
+        alert("Signed up successfully!");
 
-        alert("Signed up and logged in successfully!");
-
-        // Optionally, redirect or perform any other actions upon successful signup/login
+        // Optionally, redirect or perform any other actions upon successful signup
         // window.location.href = '/dashboard'; // Example redirect
 
         setFormData({
