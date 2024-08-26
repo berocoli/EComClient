@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Login.css'; // Adjust the path as necessary
 import FormComponent from '../signupComponent/signup'; // Adjust the path if necessary
+import { Link, Route } from 'react-router-dom';
 
 const LoginComponent = () => {
     const [formData, setFormData] = useState({
@@ -41,13 +42,18 @@ const LoginComponent = () => {
                     const decodedToken = JSON.parse(atob(token.split('.')[1]));
                     console.log('Decoded JWT:', decodedToken);
 
-                    const { name, email } = decodedToken;
+                    const { name, email, role } = decodedToken;
                     sessionStorage.setItem('userName', name);
                     sessionStorage.setItem('userEmail', email);
+                    sessionStorage.setItem('userRole', role);
 
                     alert('Logged in successfully!');
                     sessionStorage.setItem('isLoggedIn', 'true');
-                    window.location.reload();
+                    if(role === 'Admin') {
+                        window.location.href = '/admin';
+                    } else { 
+                        window.location.reload();
+                    }
                 } else {
                     console.error('Token is undefined:', data);
                     alert('Failed to retrieve a valid token.');

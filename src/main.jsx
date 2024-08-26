@@ -1,24 +1,45 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client'; // Make sure you are importing from 'react-dom/client' for React 18
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import App from './App';
-import FormComponent from './signupComponent/signup';
-import LoginComponent from './loginComponent/login';
-import ErrorBoundary from './errorBoundary';
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+      const loginResponse = await fetch(`https://localhost:7281/api/Auth/Login?Email=${encodeURIComponent(formData.email)}&Password=${encodeURIComponent(formData.password)}`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+      if (loginResponse.ok) {
+          const data = await loginResponse.json();
+          const token = data.token?.access;
+          if (token) {
+              sessionStorage.setItem('token', token);
 
-root.render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <Router>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/login" element={<LoginComponent />} />
-          <Route path="/signup" element={<FormComponent />} />
-          <Route path="*" element={<h1>404 Not Found</h1>} />
-        </Routes>
-      </Router>
-    </ErrorBoundary>
-  </React.StrictMode>
-);
+              const decodedToken = JSON.parse(atob(token.split('.')[1]));
+              const { name, email, role } = decodedToken;
+              sessionStorage.setItem('userName', name);
+              sessionStorage.setItem('userEmail', email);
+              sessionStorage.setItem('userRole', role);
+
+              alert('Logged in successfully!');
+              sessionStorage.setItem('isLoggedIn', 'true');
+
+              // Redirect based on role
+              if (role === 'Admin') {
+                  window.location.href = '/admin';
+              } else {
+                  window.location.reload();
+              }
+          } else {
+              alert('Failed to retrieve a valid token.');
+              sessionStorage.setItem('isLoggedIn', 'false');
+          }
+      } else {
+          alert('Failed to log in. Please try again.');
+          sessionStorage.setItem('isLoggedIn', 'false');
+      }
+  } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again later.');
+      sessionStorage.setItem('isLoggedIn', 'false');
+  }
+};

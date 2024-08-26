@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
-import LoginForm from './loginComponent/Login';
+import LoginComponent from './loginComponent/Login';
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import PdfButtonComponent from './PdfButtonComponent/pdfComponent';
 import ProductsComponent from './productsComponent/Products';
 import CurrencyRates from './CurrencyComponent/CurrencyRate';
 import Profile from './ProfileComponent/Profile';
+import AdminComponent from './AdminPage/AdminPageComponent';
 
 function App() {
   const [apiData, setApiData] = useState(null);
@@ -15,7 +16,7 @@ function App() {
   const [showButton, setShowButton] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-
+  const uRole = sessionStorage.getItem('userRole');
   useEffect(() => {
     const loggedIn = JSON.parse(sessionStorage.getItem('isLoggedIn'));
     setIsLoggedIn(loggedIn === true);
@@ -83,12 +84,15 @@ function App() {
     setApiData(null);
     setCurrencies(null);
     setShowForm(false);
-    setShowButton(false);
 
     setShowProfile((prevShowProfile) => !prevShowProfile);
   }
 
   return (
+    {uRole === 'Admin' && (
+      <AdminComponent />
+    )
+    }
     <div>
       <nav className="flex fixed justify-between items-center top-0 left-0 w-full bg-slate-600 text-white p-4 shadow z-50">
         <span className="rounded-lg bg-zinc-700 hover:bg-zinc-800 px-2 py-1 cursor-help" onClick={pageReloader}>BERKE ÖZTÜRK</span>
@@ -161,10 +165,10 @@ function App() {
           </div>
         )}
 
-        {showForm && <LoginForm />}
+        {showForm && <LoginComponent />}
 
         {/* Show ProductsComponent only when none of the others are shown */}
-        {!apiData && !currencies && !showForm && (
+        {!apiData && !currencies && !showForm && !showProfile &&(
           <div className="mt-8">
             <ProductsComponent />
           </div>
