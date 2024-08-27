@@ -1,13 +1,12 @@
 import React, { useState } from "react";
+import AdminNavbar from "./AdminNavbar/AdminBarComponent";
 
 const AdminComponent = () => {
-    
-    return
-    (
+    return (
         <div>
-            <h1>Admin Page</h1>
-            <p>Welcome to the admin page!</p>
+            <AdminNavbar />
         </div>
     );
 };
+
 export default AdminComponent;

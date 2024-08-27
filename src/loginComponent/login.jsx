@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Login.css'; // Adjust the path as necessary
-import FormComponent from '../signupComponent/signup'; // Adjust the path if necessary
+import FormComponent from '../signupComponent/Signup'; // Adjust the path if necessary
 import { Link, Route } from 'react-router-dom';
 
 const LoginComponent = () => {
@@ -45,11 +45,11 @@ const LoginComponent = () => {
                     const { name, email, role } = decodedToken;
                     sessionStorage.setItem('userName', name);
                     sessionStorage.setItem('userEmail', email);
-                    sessionStorage.setItem('userRole', role);
-
+                    
                     alert('Logged in successfully!');
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    if(role === 'Admin') {
+                    sessionStorage.setItem('isLoggedIn', 'True');
+                    if(role === 'true') {
+                        sessionStorage.setItem('userRole', 'Admin');
                         window.location.href = '/admin';
                     } else { 
                         window.location.reload();

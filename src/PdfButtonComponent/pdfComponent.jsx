@@ -5,7 +5,7 @@ import FileSaver from "file-saver";
 const PdfButtonComponent = () => {
     const downloadButton = async () => {
         try {
-            const response = await axios.get("https://localhost:7281/api/Customers/PDF", {
+            const response = await axios.get("https://localhost:7281/api/User/PDF", {
                 responseType: 'blob',
             });
             if (response.status === 200 && response.data) {
